@@ -17,9 +17,9 @@ public class Order
     }
 
 
-    public Order CreateNew(int customerId, string customerName, int createdUserId, IReadOnlyCollection<OrderItem> items)
+    public static Order CreateNew(int customerId, string customerName, int createdUserId, IReadOnlyCollection<OrderItem> items)
     {
-        if (_items.Count == 0)
+        if (items.Count == 0)
             throw new Exception("Order has no items"); // must be changed
         var id = GenerateNewId();
         var totalAmount = items.Select(item => item.UnitPrice * item.Quantity).SumInSameCurrencies();
@@ -70,13 +70,13 @@ public class Order
         };
     }
 
-    public void CheckConfirm()
+    private void CheckConfirm()
     {
         if (Confirmed)
             throw new Exception("Order is confirmed and is not editable");
     }
 
-    private int GenerateNewId() // must be changed
+    private static int GenerateNewId() // must be changed
     {
         int newId = 1;
         return newId;
@@ -88,7 +88,7 @@ public class Order
     public Money TotalAmount { get; private set; }
     public DateTime OrderDate { get; private set; }
     public int CreatedUserId { get; private set; }
-    public bool Confirmed { get; set; }
+    public bool Confirmed { get; private set; }
 
     private readonly List<OrderItem> _items;
     public IReadOnlyCollection<OrderItem> Items => _items;

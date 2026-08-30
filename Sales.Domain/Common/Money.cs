@@ -1,7 +1,17 @@
 ﻿namespace Sales.Domain.Common;
 
-public record struct Money(decimal Amount, string Currency)
+public record struct Money
 {
+    public decimal Amount { get; }
+    public string Currency { get; }
+
+    public Money(decimal Amount, string Currency)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(Amount);
+        this.Amount = Amount;
+        this.Currency = Currency;
+    }
+
     public static Money operator +(Money left, Money right)
         => new(left.Amount + CurrencyConvertor(right, left.Currency).Amount, left.Currency);
     public static Money operator *(Money money, decimal multiplier)
@@ -15,10 +25,18 @@ public static class MoneyExtentions
 {
     public static Money SumInSameCurrencies(this IEnumerable<Money> source)
     {
-        if (source.Select(x => x.Currency).Distinct().Count() > 1)
-            throw new Exception("Currencies are different");
-        var sumAmount = source.Sum(x => x.Amount);
-        var currency = source.First().Currency;
+        string? currency = null;
+        decimal sumAmount = 0;
+
+        foreach (var item in source)
+        {
+            if (currency is null)
+                currency = item.Currency;
+            else if (item.Currency != currency)
+                throw new Exception("Currencies are different");
+            sumAmount += item.Amount;
+        }
+
         return new(sumAmount, currency);
     }
     public static Money SumInDifferentCurrencies(this IEnumerable<Money> source, string destinationCurrency)
