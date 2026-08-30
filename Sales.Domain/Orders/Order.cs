@@ -19,6 +19,8 @@ public class Order
 
     public Order CreateNew(int customerId, string customerName, int createdUserId, IReadOnlyCollection<OrderItem> items)
     {
+        if (_items.Count == 0)
+            throw new Exception("Order has no items"); // must be changed
         var id = GenerateNewId();
         var totalAmount = items.Select(item => item.UnitPrice * item.Quantity).SumInSameCurrencies();
         var order = new Order(id, customerId, customerName, totalAmount, DateTime.Now, createdUserId, false, items);
@@ -26,28 +28,52 @@ public class Order
     }
     public void Confirm()
     {
+        CheckConfirm();
         if (_items.Count == 0)
             throw new Exception("Order has no items"); // must be changed
         Confirmed = true;
     }
     public void AddItem(OrderItem newItem)
     {
+        CheckConfirm();
         _items.Add(newItem);
     }
     public void AddItems(List<OrderItem> newItems)
     {
+        CheckConfirm();
         _items.AddRange(newItems);
     }
     public void RemoveItem(int productId)
     {
+        CheckConfirm();
         var item = _items.FirstOrDefault(item => item.ProductId == productId)
             ?? throw new KeyNotFoundException($"Product with id : {{{productId}}} not found in this order");
         _items.Remove(item);
     }
     public void RemoveItems(List<int> productIds)
     {
+        CheckConfirm();
         foreach (var productId in productIds)
             RemoveItem(productId);
+    }
+    public void UpdateOrderItemQuantity(int productId, int quantity)
+    {
+        CheckConfirm();
+        var index = _items.FindIndex(x => x.ProductId == productId);
+
+        if (index == -1)
+            throw new InvalidOperationException("Order item not found.");
+
+        _items[index] = _items[index] with
+        {
+            Quantity = quantity
+        };
+    }
+
+    public void CheckConfirm()
+    {
+        if (Confirmed)
+            throw new Exception("Order is confirmed and is not editable");
     }
 
     private int GenerateNewId() // must be changed

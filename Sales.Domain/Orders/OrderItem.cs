@@ -2,6 +2,6 @@
 
 namespace Sales.Domain.Orders;
 
-public record OrderItem(int OrderId, int ProductId, Money UnitPrice, int Quantity)
+public record class  OrderItem(int OrderId, int ProductId, Money UnitPrice, int Quantity)
 {
 }
