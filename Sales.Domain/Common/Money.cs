@@ -1,6 +1,6 @@
 ﻿namespace Sales.Domain.Common;
 
-public record struct Money
+public readonly record struct Money
 {
     public decimal Amount { get; }
     public string Currency { get; }
@@ -16,9 +16,11 @@ public record struct Money
         => new(left.Amount + CurrencyConvertor(right, left.Currency).Amount, left.Currency);
     public static Money operator *(Money money, decimal multiplier)
         => new(money.Amount * multiplier, money.Currency);
+    public static Money operator *(decimal multiplier,Money money)
+        => new(money.Amount * multiplier, money.Currency);
 
     public static Money CurrencyConvertor(Money money, string destinationCurrency)
-        => new(money.Amount, destinationCurrency); // must be changed
+        => throw new ArithmeticException("Currency conversion is not possible yet");
 }
 
 public static class MoneyExtentions
@@ -27,6 +29,9 @@ public static class MoneyExtentions
     {
         string? currency = null;
         decimal sumAmount = 0;
+
+        if(!source.Any())
+            throw new InvalidOperationException("Can not operate sum on empty collection");
 
         foreach (var item in source)
         {

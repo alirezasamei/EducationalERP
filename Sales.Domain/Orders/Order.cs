@@ -17,7 +17,7 @@ public class Order
     }
 
 
-    public static Order CreateNew(int customerId, string customerName, int createdUserId, IReadOnlyCollection<OrderItem> items)
+    public static Order Create(int customerId, string customerName, int createdUserId, IReadOnlyCollection<OrderItem> items)
     {
         if (items.Count == 0)
             throw new Exception("Order has no items"); // must be changed
@@ -36,9 +36,10 @@ public class Order
     public void AddItem(OrderItem newItem)
     {
         CheckConfirm();
+        TotalAmount += newItem.Quantity * newItem.UnitPrice;
         _items.Add(newItem);
     }
-    public void AddItems(List<OrderItem> newItems)
+    public void AddItems(IEnumerable<OrderItem> newItems)
     {
         CheckConfirm();
         _items.AddRange(newItems);
@@ -50,7 +51,7 @@ public class Order
             ?? throw new KeyNotFoundException($"Product with id : {{{productId}}} not found in this order");
         _items.Remove(item);
     }
-    public void RemoveItems(List<int> productIds)
+    public void RemoveItems(IEnumerable<int> productIds)
     {
         CheckConfirm();
         foreach (var productId in productIds)
@@ -59,15 +60,14 @@ public class Order
     public void UpdateOrderItemQuantity(int productId, int quantity)
     {
         CheckConfirm();
-        var index = _items.FindIndex(x => x.ProductId == productId);
+        var item = _items.FirstOrDefault(x => x.ProductId == productId);
 
-        if (index == -1)
+        if (item is null)
             throw new InvalidOperationException("Order item not found.");
 
-        _items[index] = _items[index] with
-        {
-            Quantity = quantity
-        };
+        item.ChangeQuantity(quantity, out var increasedAmount);
+
+        TotalAmount += increasedAmount;
     }
 
     private void CheckConfirm()
