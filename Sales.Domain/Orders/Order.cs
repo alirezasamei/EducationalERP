@@ -33,22 +33,24 @@ public class Order
             throw new Exception("Order has no items"); // must be changed
         Confirmed = true;
     }
-    public void AddItem(OrderItem newItem)
+    public void AddItem(OrderItem item)
     {
         CheckConfirm();
-        TotalAmount += newItem.Quantity * newItem.UnitPrice;
-        _items.Add(newItem);
+        TotalAmount += item.Quantity * item.UnitPrice;
+        _items.Add(item);
     }
     public void AddItems(IEnumerable<OrderItem> newItems)
     {
         CheckConfirm();
+        TotalAmount += newItems.Select(item => item.Quantity * item.UnitPrice).SumInSameCurrencies();
         _items.AddRange(newItems);
     }
     public void RemoveItem(int productId)
     {
         CheckConfirm();
-        var item = _items.FirstOrDefault(item => item.ProductId == productId)
-            ?? throw new KeyNotFoundException($"Product with id : {{{productId}}} not found in this order");
+        var item = GetOrderItemByProductId(productId);
+
+        TotalAmount -= item.Quantity * item.UnitPrice;
         _items.Remove(item);
     }
     public void RemoveItems(IEnumerable<int> productIds)
@@ -60,14 +62,18 @@ public class Order
     public void UpdateOrderItemQuantity(int productId, int quantity)
     {
         CheckConfirm();
-        var item = _items.FirstOrDefault(x => x.ProductId == productId);
+        var item = GetOrderItemByProductId(productId);
 
-        if (item is null)
-            throw new InvalidOperationException("Order item not found.");
+        item.ChangeQuantity(quantity, out var amountDelta);
 
-        item.ChangeQuantity(quantity, out var increasedAmount);
+        TotalAmount += amountDelta;
+    }
 
-        TotalAmount += increasedAmount;
+    public OrderItem GetOrderItemByProductId(int productId)
+    {
+        var item = _items.FirstOrDefault(x => x.ProductId == productId)
+            ?? throw new KeyNotFoundException($"Product with id : {{{productId}}} not found in this order");
+        return item;
     }
 
     private void CheckConfirm()

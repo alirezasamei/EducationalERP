@@ -24,11 +24,11 @@ public record class OrderItem
         return new OrderItem(orderId, productId, unitPrice, quantity);
     }
 
-    public void ChangeQuantity(int quantity, out Money increasedAmount)
+    public void ChangeQuantity(int quantity, out Money amountDelta)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(quantity);
 
-        increasedAmount = UnitPrice * (quantity - Quantity);
+        amountDelta = UnitPrice * (quantity - Quantity);
         Quantity = quantity;
     }
 }

@@ -14,13 +14,18 @@ public readonly record struct Money
 
     public static Money operator +(Money left, Money right)
         => new(left.Amount + CurrencyConvertor(right, left.Currency).Amount, left.Currency);
+    public static Money operator -(Money left, Money right)
+        => new(left.Amount - CurrencyConvertor(right, left.Currency).Amount, left.Currency);
     public static Money operator *(Money money, decimal multiplier)
         => new(money.Amount * multiplier, money.Currency);
-    public static Money operator *(decimal multiplier,Money money)
+    public static Money operator *(decimal multiplier, Money money)
         => new(money.Amount * multiplier, money.Currency);
 
     public static Money CurrencyConvertor(Money money, string destinationCurrency)
-        => throw new ArithmeticException("Currency conversion is not possible yet");
+    {
+        if (money.Currency != destinationCurrency) throw new ArithmeticException("Currency conversion is not possible yet");
+        return money;
+    }
 }
 
 public static class MoneyExtentions
@@ -30,7 +35,7 @@ public static class MoneyExtentions
         string? currency = null;
         decimal sumAmount = 0;
 
-        if(!source.Any())
+        if (!source.Any())
             throw new InvalidOperationException("Can not operate sum on empty collection");
 
         foreach (var item in source)
