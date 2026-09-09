@@ -4,7 +4,7 @@ namespace Sales.Domain.Orders;
 
 public class Order
 {
-    private Order(int Id, int CustomerId, string CustomerName, Money TotalAmount, DateTime OrderDate, int CreatedUserId, bool Confirmed, IReadOnlyCollection<OrderItem> Items)
+    private Order(int Id, int CustomerId, string CustomerName, Money TotalAmount, DateTime OrderDate, int CreatedUserId, bool Confirmed, IEnumerable<OrderItem> Items)
     {
         this.Id = Id;
         this.CustomerId = CustomerId;
@@ -17,9 +17,9 @@ public class Order
     }
 
 
-    public static Order Create(int customerId, string customerName, int createdUserId, IReadOnlyCollection<OrderItem> items)
+    public static Order Create(int customerId, string customerName, int createdUserId, IEnumerable<OrderItem> items)
     {
-        if (items.Count == 0)
+        if (!items.Any())
             throw new Exception("Order has no items"); // must be changed
         var id = GenerateNewId();
         var totalAmount = items.Select(item => item.UnitPrice * item.Quantity).SumInSameCurrencies();
