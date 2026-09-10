@@ -19,11 +19,12 @@ public class Order
 
     public static Order Create(int customerId, string customerName, int createdUserId, IEnumerable<OrderItem> items)
     {
-        if (!items.Any())
+        List<OrderItem> itemList = [.. items];
+        if (itemList.Count == 0)
             throw new Exception("Order has no items"); // must be changed
         var id = GenerateNewId();
-        var totalAmount = items.Select(item => item.UnitPrice * item.Quantity).SumInSameCurrencies();
-        var order = new Order(id, customerId, customerName, totalAmount, DateTime.Now, createdUserId, false, items);
+        var totalAmount = itemList.Select(item => item.UnitPrice * item.Quantity).SumInSameCurrencies();
+        var order = new Order(id, customerId, customerName, totalAmount, DateTime.Now, createdUserId, false, itemList);
         return order;
     }
     public void Confirm()
