@@ -4,16 +4,16 @@ namespace Sales.Domain.Orders;
 
 public class Order
 {
-    private Order(int Id, int CustomerId, string CustomerName, Money TotalAmount, DateTime OrderDate, int CreatedUserId, bool Confirmed, IEnumerable<OrderItem> Items)
+    private Order(int id, int customerId, string customerName, Money totalAmount, DateTime orderDate, int createdUserId, bool confirmed, IEnumerable<OrderItem> items)
     {
-        this.Id = Id;
-        this.CustomerId = CustomerId;
-        this.CustomerName = CustomerName;
-        this.TotalAmount = TotalAmount;
-        this.OrderDate = OrderDate;
-        this.CreatedUserId = CreatedUserId;
-        this.Confirmed = Confirmed;
-        _items = [.. Items];
+        Id = id;
+        CustomerId = customerId;
+        CustomerName = customerName;
+        TotalAmount = totalAmount;
+        OrderDate = orderDate;
+        CreatedUserId = createdUserId;
+        Confirmed = confirmed;
+        _items = [.. items];
     }
 
 
