@@ -14,6 +14,7 @@ public class Order
         CreatedUserId = createdUserId;
         Confirmed = confirmed;
         _items = [.. items];
+        CheckDuplicateProduct();
     }
 
 
@@ -39,12 +40,14 @@ public class Order
         CheckConfirm();
         TotalAmount += item.Quantity * item.UnitPrice;
         _items.Add(item);
+        CheckDuplicateProduct();
     }
-    public void AddItems(IEnumerable<OrderItem> newItems)
+    public void AddItems(IEnumerable<OrderItem> items)
     {
         CheckConfirm();
-        TotalAmount += newItems.Select(item => item.Quantity * item.UnitPrice).SumInSameCurrencies();
-        _items.AddRange(newItems);
+        TotalAmount += items.Select(item => item.Quantity * item.UnitPrice).SumInSameCurrencies();
+        _items.AddRange(items);
+        CheckDuplicateProduct();
     }
     public void RemoveItem(int productId)
     {
@@ -83,6 +86,18 @@ public class Order
             throw new Exception("Order is confirmed and is not editable");
     }
 
+    private void CheckDuplicateProduct()
+    {
+        var productIds = _items.Select(x => x.ProductId).OrderBy(x => x);
+        int lastProductId = 0;
+        foreach (var productId in productIds)
+        {
+            if (productId == lastProductId)
+                throw new Exception($"Product with id : {{{productId}}} is duplicated");
+            lastProductId = productId;
+        }
+    }
+
     private static int GenerateNewId() // must be changed
     {
         int newId = 1;
@@ -97,6 +112,6 @@ public class Order
     public int CreatedUserId { get; private set; }
     public bool Confirmed { get; private set; }
 
-    private readonly List<OrderItem> _items;
+    private readonly List<OrderItem> _items = [];
     public IReadOnlyCollection<OrderItem> Items => _items;
 }
