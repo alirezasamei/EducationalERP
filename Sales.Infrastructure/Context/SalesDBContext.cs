@@ -9,7 +9,7 @@ public class SalesDBContext(DbContextOptions<SalesDBContext> options) : DbContex
     public DbSet<Order> Orders { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(OrderConfigurations).Assembly);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(OrderConfiguration).Assembly);
         base.OnModelCreating(modelBuilder);
     }
 }

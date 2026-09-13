@@ -4,7 +4,7 @@ using Sales.Domain.Orders;
 
 namespace Sales.Infrastructure.Persistence.configurations;
 
-public class OrderConfigurations : IEntityTypeConfiguration<Order>
+public class OrderConfiguration : IEntityTypeConfiguration<Order>
 {
     public void Configure(EntityTypeBuilder<Order> builder)
     {
